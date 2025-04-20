@@ -1,204 +1,177 @@
-/* reset básico */
+@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
+
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
-  }
-  
-  /* corpo inicial: sem scroll, só envelope */
-  html, body {
-    width: 100%;
-    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+html{
+    overflow-x: hidden;
+}
+body {
+    height: 100vh;
+    width: 100vw;
     overflow: hidden;
-    background: #eee;
+    background: linear-gradient(135deg, #ece9e6, #ffffff);
+    position: relative;
+}
+
+.carrosel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Georgia', serif;
-    font-size: 2rem
-  }
-  
-  /* botão de avançar */
-  .proximo {
-    position: fixed;
-    bottom: 2rem;
+    perspective: 1000px;
+}
+
+.foto {
+    position: absolute;
     background: white;
-    padding: 5rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  }
-  
-  /* o envelope */
-  .envelope {
-    position: relative;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.6s ease;
+    opacity: 0;
+    transform: translateX(100vw) scale(0.6);
+}
+
+.foto img {
+    max-width: 70vw;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+}
+
+.focado {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    z-index: 3;
+}
+
+.antes {
+    transform: translateX(-150px) scale(0.8);
+    opacity: 0.5;
+    z-index: 2;
+}
+
+.depois {
+    transform: translateX(150px) scale(0.8);
+    opacity: 0.5;
+    z-index: 2;
+}
+
+.done {
+    transform: translateX(300px) scale(0.6) rotateY(45deg);
+    opacity: 0;
+    z-index: 1;
+}
+
+/* Envelope visual */
+.envelope {
     width: 300px;
     height: 200px;
-    perspective: 1000px;
-    transition: none; /* sem animações extras */
-  }
-  
-  /* abas do envelope */
-  .cima, .baixo, .esquerda, .direita {
+    background: #d5a679;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px #8b5e3c, 0 4px 20px rgba(0, 0, 0, 0.3);
     position: absolute;
-    width: 0; height: 0;
-    border-style: solid;
+    padding: 0;
+}
+.envelope::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 50%;
+    background: #8b5e3c;
+    clip-path: polygon(0 0, 100% 0, 50% 100%, 0 0);
     transition: transform 1s ease;
-    z-index: 10;
-  }
-  
-  .cima {
-    border-width: 100px 150px 0 150px;
-    border-color: #b30000 transparent transparent transparent;
-    top: 0; left: 0;
     transform-origin: top center;
-  }
-  
-  .baixo {
-    border-width: 0 150px 100px 150px;
-    border-color: transparent transparent #b30000 transparent;
-    bottom: 0; left: 0;
-  }
-  
-  .esquerda {
-    border-width: 100px 0 100px 150px;
-    border-color: transparent transparent transparent #b30000;
-    top: 0; left: 0;
-  }
-  
-  .direita {
-    border-width: 100px 150px 100px 0;
-    border-color: transparent #b30000 transparent transparent;
-    top: 0; right: 0;
-  }
-  
-  /* carta dentro do envelope */
-  .carta {
+}
+.envelope.aberto::before {
+    transform: rotateX(180deg);
+}
+
+/* HUD fixa, agora colada no fundo da tela */
+.hud {
     position: absolute;
-    top: 40px; left: 60px;
-    width: 180px; height: 120px;
-    background: #fffdf8;
-    border-radius: 5px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.3);
-    overflow: hidden;
-    transition: height 1s ease, top 1s ease;
-    z-index: 5;
-  }
-  
-  /* conteúdo da carta (para rolar internamente antes de abrir por completo) */
-  .carta .conteudo {
-    padding-right: 1rem;
-    max-height: 100%;
-    overflow: hidden;
-  }
-  
-  /* step 1: abre somente a aba e mostra mais da carta */
-  .envelope.aberto .cima {
-    transform: rotateX(150deg);
-  }
-  
-  .envelope.aberto .carta {
-    top: 20px;
-    height: 180px;
-  }
-  
-  /* step 2: carta sai para ocupar a viewport toda */
-  .envelope.carta-aberta .carta {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    border-radius: 0 !important;
-    padding: 40px 20px !important;
-    font-size: 18px !important;
-    overflow-y: auto !important;
-    z-index: 100;
-  }
-  
-  /* liberar scroll no body quando a carta abre */
-  body.carta-aberta {
-    overflow: auto;
-  }
-  
-  /* remover qualquer opacidade especial do envelope */
-  .envelope.carta-aberta {
-    position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 8vh;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.hud img {
+    width: 4vh;
+}
+
+.up, .down {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Quando chegar no envelope: aparece botão "ABRIR" */
+.hud.abrir .up,
+.hud.abrir .down {
+    width: 100%;
+}
+
+.hud.abrir .up img,
+.hud.abrir .down img {
+    display: none;
+}
+
+.hud.abrir .up::before {
+    content: "ABRIR";
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: black;
+}
+
+.hud.abrir .down {
+    display: none;
+}
+
+/* Carta em tela cheia, agora maior */
+.carta {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.carta.ativa {
+    visibility: visible;
     opacity: 1;
-  }
-  
-.polaroid-wrapper {
-	position: relative;
 }
 
-.polaroid-border::before,
-.polaroid-border::after {
-	content: "";
-	position: absolute;
-	top: 24px;
-	left: 0;
-	height: 310px;
-	width: 20px;
-	background-color: #ffffff;
-	z-index: 2000;
+.papel {
+    width: 90vw;
+    background: #fffaf0;
+    padding: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    border-radius: 16px;
+    line-height: 1.7;
 }
-
-.polaroid-border::after {
-	left: unset;
-	right: 0px;
-}
-
-.polaroid-slider {
-	background-color: #ffffff;
-	height: 420px;
-	width: 350px;
-	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-	border-radius: 5px;
-}
-
-.polaroid-slider-image {
-	width: 310px;
-	height: 310px;
-	margin: 24px auto;
-	display: block;
-	object-fit: cover;
-	object-position: 50% 50%;
-}
-
-.slick-dots {
-	bottom: 16px;
-}
-
-.slick-dots li button::before {
-	font-size: 10px;
-}
-
-.slick-dots li.slick-active button::before {
-	font-size: 12px;
-	color: #333333;
-	opacity: 1;
-}
-
-@media (max-width: 666px) {
-	.polaroid-slider {
-		height: 360px;
-		width: 300px;
-	}
-
-	.polaroid-slider-image {
-		height: 260px;
-		width: 260px;
-	}
-}
-
-      .done{
-        display: none;
-        visibility: hidden;
-      }
-
-.conteudo{
-  font-size: 2rem;
-}
-      
